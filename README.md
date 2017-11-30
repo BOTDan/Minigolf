@@ -2,7 +2,7 @@
 ### What is it?
 This is an arcade game built for the Arcade API within Tower Unite.
 ### How do I play it?
-1. Download the Arcade API [from the PixelTail Games Forums](http://forums.pixeltailgames.com/t/arcade-tool-for-people-who-want-to-mess-with-it/23715?u=botdan).
+1. Download the Arcade API [from this GitHub mirror](https://github.com/dantheradarman/Arcade-API/releases/tag/v1.1).
 2. Extract the contents of the Arcade API into a folder somewhere.
 3. Inside the `projects` folder, create a new folder called `minigolf`.
 4. Download [this repo](https://github.com/dantheradarman/Minigolf/releases/).
