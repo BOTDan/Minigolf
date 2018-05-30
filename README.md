@@ -1,4 +1,6 @@
 # Minigolf
+### Notice
+This version is really out-of-date. It will be updated when all dependancies are updated.
 ### What is it?
 This is an arcade game built for the Arcade API within Tower Unite.
 ### How do I play it?
