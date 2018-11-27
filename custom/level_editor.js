@@ -1210,7 +1210,7 @@ LEVEL_EDITOR.CreateUI = function() {
 			base.CreateCheckbox( "Start On:", "If this entity should start enabled", ["settings","start_on"] );
 		} else if ( LEVEL_EDITOR.Level[item]["type"] == "func_move" ) {
 			base.CreatePosEntry( "End Position:", "Where this object will end up", ["settings","end_pos"] );
-			base.CreateNumEntry( "Speed:", "How long the object travels for", ["settings","speed"], 0, 60, 1, true );
+			base.CreateNumEntry( "Duration:", "How long the object travels for", ["settings","speed"], 0, 60, 1, true );
 			base.CreateNumEntry( "Start Delay:", "Delay before this object starts moving", ["settings","start_delay"], 0, 60, 1, true );
 			base.CreateNumEntry( "Return Delay:", "Delay before object starts returning", ["settings","return_delay"], 0, 60, 1, true );
 			base.CreateNumEntry( "Restart Delay:", "Delay before object restarts its loop", ["settings","restart_delay"], 0, 60, 1, true );

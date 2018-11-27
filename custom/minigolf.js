@@ -528,6 +528,7 @@ MINIGOLF.Physics.Types["func_move"] = function( id, level ) {
 	this.BeginContact = function( item ) {
 		if ( !this.Collisions.includes( item ) ) {
 			this.Collisions.push( item );
+			print(item)
 		}
 	}
 
@@ -554,7 +555,7 @@ MINIGOLF.Physics.Types["func_move"] = function( id, level ) {
 
 		// Create a static body definition
 		var bodydef = new MINIGOLF.Physics.Box2D.b2BodyDef();
-		bodydef.set_type( MINIGOLF.Physics.Box2D.b2_staticBody );
+		bodydef.set_type( MINIGOLF.Physics.Box2D.b2_kinematicBody );
 		bodydef.set_position( new MINIGOLF.Physics.Box2D.b2Vec2( item["pos"]["x"] / this.Scale, item["pos"]["y"] / this.Scale ) );
 		bodydef.set_angle( -item["ang"] * ( Math.PI / 180 ) );
 
@@ -571,8 +572,6 @@ MINIGOLF.Physics.Types["func_move"] = function( id, level ) {
 		fix.set_density( 1 );
 		fix.set_friction( 1 );
 		fix.set_restitution( 0.2 );
-		fix.set_isSensor( true );
-		fix.set_filter( filter );
 
 		// Add fixture to the body
 		body.CreateFixture( fix );
@@ -597,50 +596,46 @@ MINIGOLF.Physics.Types["func_move"] = function( id, level ) {
 				if (this.CurrentModeStart + me["settings"]["start_delay"] < GameBase.GetTime()) {
 					this.CurrentMode = 1 // Go to moving phase
 					this.CurrentModeStart = GameBase.GetTime();
+					var next_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["end_pos"]["x"] / this.Scale, me["settings"]["end_pos"]["y"] / this.Scale );
+					next_pos.op_sub(this.Body.GetPosition())
+					next_pos.op_mul(1/me["settings"]["speed"]);
+					this.Body.SetLinearVelocity( next_pos );
 				}
 			} else if (this.CurrentMode == 0) { // If we're waiting to start
 				if (this.CurrentModeStart + me["settings"]["restart_delay"] < GameBase.GetTime()) { // Ready to start moving
 					this.CurrentMode = 1; // Go to moving forward phase
 					this.CurrentModeStart = GameBase.GetTime();
+					var next_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["end_pos"]["x"] / this.Scale, me["settings"]["end_pos"]["y"] / this.Scale );
+					next_pos.op_sub(this.Body.GetPosition())
+					next_pos.op_mul(1/me["settings"]["speed"]);
+					this.Body.SetLinearVelocity( next_pos );
 				}
 			} else if (this.CurrentMode == 1) { // If we're moving forward
-				var cur_pos = this.Body.GetPosition();
-				var next_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["end_pos"]["x"] / this.Scale, me["settings"]["end_pos"]["y"] / this.Scale );
-				var diff = next_pos;
-				diff.op_sub( cur_pos );
-				var per = (1/me["settings"]["speed"]) / Math.abs(diff.Length());
-				if (per >= 1) { // We're where we need to be
-					var next_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["end_pos"]["x"] / this.Scale, me["settings"]["end_pos"]["y"] / this.Scale );
-					this.Body.SetTransform( next_pos, this.Body.GetAngle() );
-					this.CurrentMode = 2 // End stage waiting
+				if (this.CurrentModeStart + me["settings"]["speed"] <= GameBase.GetTime()) {
+					// Assume we've moved far enough
+					var final_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["end_pos"]["x"] / this.Scale, me["settings"]["end_pos"]["y"] / this.Scale );
+					this.Body.SetLinearVelocity( new MINIGOLF.Physics.Box2D.b2Vec2( 0, 0 ) );
+					this.Body.SetTransform( final_pos, this.Body.GetAngle() );
+					this.CurrentMode = 2;
 					this.CurrentModeStart = GameBase.GetTime();
-				} else {
-					var upd_pos = cur_pos
-					next_pos.op_mul( per );
-					upd_pos.op_add( next_pos );
-					this.Body.SetTransform( upd_pos, this.Body.GetAngle() );
 				}
 			} else if (this.CurrentMode == 2) { // Waiting to return
 				if (this.CurrentModeStart + me["settings"]["return_delay"] < GameBase.GetTime()) {
 					this.CurrentMode = 3 // Start returning
 					this.CurrentModeStart = GameBase.GetTime();
+					var next_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["start_pos"]["x"] / this.Scale, me["settings"]["start_pos"]["y"] / this.Scale );
+					next_pos.op_sub(this.Body.GetPosition())
+					next_pos.op_mul(1/me["settings"]["speed"]);
+					this.Body.SetLinearVelocity( next_pos );
 				}
 			} else if (this.CurrentMode == 3) { // Returning to start pos
-				var cur_pos = this.Body.GetPosition();
-				var next_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["start_pos"]["x"] / this.Scale, me["settings"]["start_pos"]["y"] / this.Scale );
-				var diff = next_pos;
-				diff.op_sub( cur_pos );
-				var per = (1/me["settings"]["speed"]) / Math.abs(diff.Length());
-				if (per >= 1) { // We're where we need to be
-					var next_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["start_pos"]["x"] / this.Scale, me["settings"]["start_pos"]["y"] / this.Scale );
-					this.Body.SetTransform( next_pos, this.Body.GetAngle() );
-					this.CurrentMode = 0 // Start stage waiting
+				if (this.CurrentModeStart + me["settings"]["speed"] <= GameBase.GetTime()) {
+					// Assume we've moved far enough
+					var final_pos = new MINIGOLF.Physics.Box2D.b2Vec2( me["settings"]["start_pos"]["x"] / this.Scale, me["settings"]["start_pos"]["y"] / this.Scale );
+					this.Body.SetLinearVelocity( new MINIGOLF.Physics.Box2D.b2Vec2( 0, 0 ) );
+					this.Body.SetTransform( final_pos, this.Body.GetAngle() );
+					this.CurrentMode = 0;
 					this.CurrentModeStart = GameBase.GetTime();
-				} else {
-					var upd_pos = cur_pos
-					next_pos.op_mul( per );
-					upd_pos.op_add( next_pos );
-					this.Body.SetTransform( upd_pos, this.Body.GetAngle() );
 				}
 			}
 		}

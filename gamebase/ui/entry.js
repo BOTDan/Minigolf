@@ -27,7 +27,8 @@ GameBase.UI.RegisterType( "entry", function() {
 		KP_9: "9",
 		KP_0: "0",
 		KP_ENTER: "RETURN",
-		KP_PERIOD: "PERIOD"
+		KP_PERIOD: "PERIOD",
+		KP_MINUS: "MINUS"
 	};
 
 	// Sets the text of the text entry
@@ -133,6 +134,10 @@ GameBase.UI.RegisterType( "entry", function() {
 		print(key);
 		if ( key == "SPACEBAR" ) {
 			return " ";
+		} else if ( key == "PERIOD" ) {
+			return ".";
+		} else if ( key == "MINUS" ) {
+			return "-";
 		}
 		return key;
 	}

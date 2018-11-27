@@ -12,17 +12,32 @@ GameBase.UI.RegisterType( "numentry", function() {
 	this.Init = function() {
 		this.Entry = GameBase.UI.CreateElement( "entry", this );
 		this.Entry.Text = "0";
+		this.Entry.OldOnKeyPressed = this.Entry.OnKeyPressed;
+		this.Entry.OnKeyPressed = function( key ) {
+			var letter = GameBase.GetKey( key );
+			letter = this.ConvertKey( letter );
+			if ( letter == "MINUS" ) {
+				if ( this.CursorLeft != 0 || this.GetText().includes("-") ) {
+					return
+				}
+			} else if ( letter == "PERIOD" ) {
+				if (this.GetText().includes(".")) {
+					return
+				}
+			}
+			this.OldOnKeyPressed(key);
+		}
 		this.Entry.OnFocusLost = function() {
 			this.GetParent().CorrectNumber();
 		}
 		this.Entry.ValidateKey = function( key ) {
-			return ("0123456789".indexOf( key ) > -1);
+			return ("0123456789-.".indexOf( key ) > -1);
 		}
 		this.Entry.OnEnterPressed = function() {
 			this.GetParent().CorrectNumber();
 		}
 		this.Entry.OnValueChanged = function( text ) {
-			this.GetParent().OnValueChanged( Number( text ) );
+			this.GetParent().OnValueChanged( text );
 		}
 
 		this.ButtonLess = GameBase.UI.CreateElement( "button", this );
@@ -94,6 +109,9 @@ GameBase.UI.RegisterType( "numentry", function() {
 	// Forces the number to be correct
 	this.CorrectNumber = function() {
 		var num = Number( this.Entry.GetText() );
+		if (num == NaN) {
+			num = 0;
+		}
 		if ( this.MinValue !== false ) {
 			num = Math.max( this.MinValue, num );
 		}
