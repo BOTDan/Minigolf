@@ -26,3 +26,5 @@ This is a 2D minigolf arcade game created using JavaScript to run on the Arcade 
 5. Open a command prompt inside the arcade api root folder (where you can see the `projects` folder and `tool.exe`)
 6. Type `tool gamebase`.
 And voila, you're done. You can open the level editor using `¬` and typing `leveledit`. There's currently no gameplay aside from the editor.
+## Media
+[YouTube Video](https://www.youtube.com/watch?v=W8a7zVHIy24)
